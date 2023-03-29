@@ -1,4 +1,4 @@
-terraform {
+  terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -21,7 +21,7 @@ resource "aws_vpc" "terravpc" {
     "Name" = "${var.default_tags.env}-VPC"
   }
 }
-
+ 
 #Pub Sub 10.0.0.0/24
 resource "aws_subnet" "pubsub" {
   count                   = var.public_subnet_count
@@ -109,4 +109,4 @@ resource "aws_route_table_association" "private" {
   count = var.private_subnet_count
   subnet_id = element(aws_subnet.prisub.*.id, count.index)
   route_table_id = aws_route_table.private.id
-}
+} 
