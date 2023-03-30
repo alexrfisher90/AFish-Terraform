@@ -1,9 +1,14 @@
-  terraform {
+terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "4.60.0"
     }
+  }
+  backend "s3"{
+    bucket = "afish-terrabucket"
+    key = "terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
@@ -21,7 +26,7 @@ resource "aws_vpc" "terravpc" {
     "Name" = "${var.default_tags.env}-VPC"
   }
 }
- 
+
 #Pub Sub 10.0.0.0/24
 resource "aws_subnet" "pubsub" {
   count                   = var.public_subnet_count
@@ -56,7 +61,7 @@ resource "aws_internet_gateway" "terraigw" {
 #NGW 
 resource "aws_nat_gateway" "terranat" {
   allocation_id = aws_eip.NAT_EIP.id
-  subnet_id = aws_subnet.pubsub.0.id
+  subnet_id     = aws_subnet.pubsub.0.id
   tags = {
     "Name" = "${var.default_tags.env}-NGW"
   }
@@ -79,14 +84,14 @@ resource "aws_route_table" "public" {
 }
 #Pub Routes - for PubRT
 resource "aws_route" "public" {
-    route_table_id = aws_route_table.public.id
-    destination_cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.terraigw.id
-  }
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.terraigw.id
+}
 #PubRT Association
 resource "aws_route_table_association" "public" {
-  count = var.public_subnet_count
-  subnet_id = element(aws_subnet.pubsub.*.id, count.index)
+  count          = var.public_subnet_count
+  subnet_id      = element(aws_subnet.pubsub.*.id, count.index)
   route_table_id = aws_route_table.public.id
 }
 #Pri Route Table 
@@ -99,14 +104,14 @@ resource "aws_route_table" "private" {
 
 #Pri Routes - for PubRT
 resource "aws_route" "private" {
-    route_table_id = aws_route_table.private.id
-    destination_cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.terranat.id
-  }
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.terranat.id
+}
 
 #PriRT Association
 resource "aws_route_table_association" "private" {
-  count = var.private_subnet_count
-  subnet_id = element(aws_subnet.prisub.*.id, count.index)
+  count          = var.private_subnet_count
+  subnet_id      = element(aws_subnet.prisub.*.id, count.index)
   route_table_id = aws_route_table.private.id
 } 
