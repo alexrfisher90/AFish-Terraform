@@ -24,37 +24,37 @@ variable "vpc_cidr" {
 }
 variable "sg_db_ingress" {
   type = map(object({
-    port = number
+    port     = number
     protocol = string
-    self = bool
+    self     = bool
   }))
   default = {
     "mysql" = {
-      port = 3306
+      port     = 3306
       protocol = "tcp"
-      self = true
+      self     = true
     }
   }
 }
-    variable "sg_db_egress" {
+variable "sg_db_egress" {
   type = map(object({
-    port = number
+    port     = number
     protocol = string
-    self = bool
+    self     = bool
   }))
   default = {
     "all" = {
-      port = 0
+      port     = 0
       protocol = -1
-      self = true
+      self     = true
     }
   }
+}
+variable "db_credentials" {
+  type      = map(any)
+  sensitive = true
+  default = {
+    username = "username"
+    password = "password"
   }
-  variable "db_credentials" {
-    type = map(any)
-    sensitive = true
-    default = {
-      username = "username"
-      password = "password"
-    }    
-  }
+}

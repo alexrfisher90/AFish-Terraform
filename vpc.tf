@@ -5,9 +5,9 @@ terraform {
       version = "4.60.0"
     }
   }
-  backend "s3"{
+  backend "s3" {
     bucket = "afish-terrabucket"
-    key = "terraform.tfstate"
+    key    = "terraform.tfstate"
     region = "us-east-1"
   }
 }
